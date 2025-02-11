@@ -8,15 +8,39 @@ const jwt=require("jsonwebtoken")
 require('dotenv').config();
 const {auth}=require("./middleware/auth.middleware")
 const cors=require("cors")
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+
 
 
 const app=express();
 app.use(cors())
 
 app.use(express.json())
+const options = {
+    definition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'learning api development',
+        version: '1.0.0',
+      },
+      servers: [
+        {
+          url: "http://localhost:9988", // Change this based on your environment
+        },
+      ],
+
+    },
+    apis: ['./routes/notesRoutes.js'], // files containing annotations as above
+};
+  
+const Specification = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(Specification));
 
 app.use("/users",userRouter)
 app.use(auth)
+
 app.use("/notes",noteRouter)
 
 

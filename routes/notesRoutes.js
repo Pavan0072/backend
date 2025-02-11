@@ -19,6 +19,73 @@ noteRouter.post("/create",async(req,res)=>{
 
 })
 
+/**
+ * @swagger
+ * tags:
+ *  name : notes
+ *  description : all the api routes related to notes
+ * 
+ * 
+ */
+/**
+ * @swagger
+ * /notes:
+ *      get:
+ *       summary : get all notes
+ *       tags : [notes]
+ *       responses:
+ *          200:
+ *              description: list of all success.
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type : array
+ *                          items :
+ *                              type : object
+ *          400:
+ *              description: incorrect request
+ *
+ */
+/**
+ * @swagger
+ * /notes/create:
+ *          post:
+ *            summary: Create a new note
+ *            tags: [notes]
+ *            description: Adds a new note to the database. Requires a valid JWT token.
+ *            security:
+ *              - BearerAuth: []  # This requires authentication
+ *            requestBody:
+ *              required: true
+ *              content:
+ *                application/json:
+ *                  schema:
+ *                    type: object
+ *                    properties:
+ *                      title:
+ *                        type: string
+ *                        example: "My New Note"
+ *                      content:
+ *                        type: string
+ *                        example: "This is the content of my note."
+ *                      authorId:
+ *                        type: string
+ *                        example: "user12345"
+ *            responses:
+ *              200:
+ *                description: Note successfully created.
+ *                content:
+ *                  application/json:
+ *                    schema:
+ *                      type: string
+ *                      example: "notes has been added"
+ *              401:
+ *                description: Unauthorized - Invalid or missing token.
+ *              500:
+ *                description: Internal Server Error.
+ */
+
+
 noteRouter.get("/blogs",async(req,res)=>{
     try{
         const blogs=await NoteModel.find({authorId:req.body.authorId})
@@ -26,6 +93,7 @@ noteRouter.get("/blogs",async(req,res)=>{
     }
     catch(err){
         console.log(err)
+        res.status(500).json({ message: "Internal Server Error" });
     }
     
 })
