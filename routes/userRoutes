@@ -1,0 +1,91 @@
+const{UserModel}=require("../models/UserSchema")
+
+const express=require("express")
+const jwt=require("jsonwebtoken")
+const bcrypt=require("bcrypt")
+const saltRounds=2;
+
+const userRouter=express.Router()
+
+userRouter.post("/register",async(req,res)=>{
+    //register
+
+    const{email,password,name,age}=req.body;
+    try{
+        
+        bcrypt.hash(password, saltRounds, async function(err, hash) {
+            // Store hash in your password DB
+            if(hash){
+                const user=new UserModel({email,name,age,password:hash})
+                await user.save()
+                res.status(200).send({message:"user has been added"})
+
+            }else{
+                res.send(`${err} at hashing`)
+
+            }
+        });
+        
+    }
+    catch(error){
+        console.log(error,res.status(400).send({error:error.message}))
+    }
+})
+
+userRouter.post("/login",async (req,res)=>{
+    const {email,password}=req.body;
+   try{
+    //const {email,password}=req.body;
+    const user=await UserModel.findOne({email:email})
+    if(user){
+        bcrypt.compare(password, user.password, function(err, result) {
+            // result == true
+            if(result){
+                const token= jwt.sign({authorId:user.id},"secret")
+                //authorName:user.name
+                console.log(user.id,user.name)
+
+                res.send({msg:"password matched",token:token})
+
+            }
+            else{
+                res.send(`password not matched`)
+            }
+        });
+        
+        
+    }
+    else{
+        res.send("password is not matched")
+
+    }
+   
+    }
+    catch(error){
+        res.send({error})
+
+    }
+});
+
+    
+
+    
+    //res.send("user has been added")
+    // console.log(user)
+    // if(user){
+    //     const token= jwt.sign({course:"backend"},"secret")
+
+    //     res.send({msg:"password matched",token:token})
+    // }
+    // else{
+    //     res.send("password is not matched")
+
+    // }
+  
+
+    //login
+
+
+module.exports={
+    userRouter
+}
